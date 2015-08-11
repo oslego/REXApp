@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var cache = {};
 var qs = document.querySelector.bind(document);
@@ -91,7 +91,8 @@ function _renderResults(results) {
       // sorted results, best rate is always at the top
   amount,
       delta,
-      sign;
+      sign,
+      rateClass;
 
   host.innerHTML = results.map(function (result) {
     amount = result.amount;
