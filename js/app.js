@@ -63,7 +63,7 @@ function _getResults(query){
 
           return {
             bank: cache.banks[rate.id].name,
-            amount: (amount < 1000) ? amount.toFixed(2) : Math.round(amount),
+            amount: amount,
             operation: query.operation
           }
         }).sort( (a, b) => {
@@ -83,23 +83,31 @@ function _getResults(query){
 function _renderResults(results){
   var host = qs('#results'),
       best = results[0].amount, // sorted results, best rate is always at the top
-      delta, deltaTag;
+      amount, delta, sign;
 
   host.innerHTML = results.map( (result) => {
-    delta = -1 * (best - result.amount);
+    amount = result.amount;
+    delta = -1 * (best - amount);
+    sign = (delta > 0) ? "+" : "";
+    rateClass = (delta === 0) ? "best-rate" : "";
 
     if (delta === 0){
-      deltaTag = `<div class="delta best-rate">cel mai bun curs</div>`
+      delta = "cel mai bun curs";
     } else {
-      delta = (result.amount < 1000) ? delta.toFixed(2) : Math.round(delta);
-      deltaTag = `<div class="delta">${ Number(delta).toLocaleString('ro-RO') }</div>`
+      delta = (result.amount < 1000)
+        ? Number(delta).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : Number(delta).toLocaleString('ro-RO', Math.round(delta));
     }
+
+    amount = (result.amount < 1000)
+      ? Number(amount).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      : Number(amount).toLocaleString('ro-RO', Math.round(amount));
 
     return `<li class="result__item">
       <span class="bank">${result.bank}</span>
       <div class="rate">
-        <div class="total">${Number(result.amount).toLocaleString('ro-RO')}</div>
-        ${deltaTag}
+        <div class="total">${amount}</div>
+        <div class="delta ${rateClass}">${sign}${delta}</div>
       </div>
     </li>`
   }).join('');
