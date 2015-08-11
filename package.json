@@ -6,7 +6,7 @@
     "scaffold": "mkdir -p dist/css dist/js && cp CNAME dist/",
     "autoprefix": "postcss --use autoprefixer dist/css/*.css -d dist/css/",
 
-    "concat:js": "uglifyjs --compress -- js/jsonp.js js/es6-promise.js dist/js/app.es5.js > dist/js/main.js",
+    "concat:js": "uglifyjs --compress -- js/jsonp.js js/es6-promise.js js/toLocaleString.js dist/js/app.es5.js > dist/js/main.js",
 
     "build:js":      "babel js/app.js -o dist/js/app.es5.js",
     "build:css":     "node-sass --output-style=compressed css/style.scss -o dist/css/",
