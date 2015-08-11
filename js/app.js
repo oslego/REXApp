@@ -1,3 +1,5 @@
+"use strict";
+
 var cache = {};
 var qs = document.querySelector.bind(document);
 
@@ -83,7 +85,7 @@ function _getResults(query){
 function _renderResults(results){
   var host = qs('#results'),
       best = results[0].amount, // sorted results, best rate is always at the top
-      amount, delta, sign;
+      amount, delta, sign, rateClass;
 
   host.innerHTML = results.map( (result) => {
     amount = result.amount;
