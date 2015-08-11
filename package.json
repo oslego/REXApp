@@ -1,10 +1,32 @@
 {
   "name": "rexapp",
   "version": "0.0.1",
+  "scripts": {
+    "clean": "rm -rf dist/*",
+    "scaffold": "mkdir -p dist/css dist/js && cp CNAME dist/",
+    "autoprefix": "postcss --use autoprefixer dist/css/*.css -d dist/css/",
+
+    "concat:js": "uglifyjs --compress -- js/jsonp.js js/es6-promise.js dist/js/app.es5.js > dist/js/main.js",
+
+    "build:js":      "babel js/app.js -o dist/js/app.es5.js",
+    "build:css":     "node-sass --output-style=compressed css/style.scss -o dist/css/",
+    "build:css:dev": "node-sass --output-style=expanded css/style.scss -o css/ -w -x",
+    "build:html":    "usemin index.html -d dist -o dist/index.html --noprocess",
+
+    "build": "npm run clean && npm run scaffold && npm run build:js && npm run concat:js && npm run build:html && npm run build:css && npm run autoprefix",
+
+    "start": "npm run build:css:dev"
+  },
   "devDependencies": {
+    "autoprefixer": "^5.2.0",
+    "babel": "^5.8.21",
     "grunt": "~0.4.1",
     "grunt-contrib-sass": "^0.5.1",
-    "grunt-contrib-watch": "^0.4.4"
+    "grunt-contrib-watch": "^0.4.4",
+    "node-sass": "^3.2.0",
+    "postcss-cli": "^1.5.0",
+    "uglify-js": "^2.4.24",
+    "usemin-cli": "oslego/usemin-cli#noprocess"
   },
   "engines": {
     "node": ">=0.10.0"
