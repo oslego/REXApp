@@ -73,7 +73,7 @@ function _getResults(query){
             lowest first if bank is selling,
             highest first if bank is buying
           */
-          return (query.operation === 'sell') ? a.amount > b.amount : a.amount < b.amount
+          return (query.operation === 'sell') ? a.amount - b.amount : b.amount - a.amount
         })
 
       resolve(results);
