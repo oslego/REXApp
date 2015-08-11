@@ -41,11 +41,10 @@ function _setupSearchForm(){
   var form = qs('#search');
 
   form.addEventListener('submit', (e) => {
-
     var query = {
-      operation: (e.target.operation.value === 'buy') ? 'sell' : 'buy',
-      currency: e.target.currency.value,
-      amount:  e.target.amount.value
+      operation: (form.elements.operation.value === 'buy') ? 'sell' : 'buy',
+      currency: form.elements.currency.value,
+      amount:  form.elements.amount.value
     }
 
     _getResults(query).then(_renderResults);
