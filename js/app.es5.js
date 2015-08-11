@@ -68,7 +68,7 @@ function _getResults(query) {
 
           return {
             bank: cache.banks[rate.id].name,
-            amount: amount < 1000 ? amount.toFixed(2) : Math.round(amount),
+            amount: amount,
             operation: query.operation
           };
         }).sort(function (a, b) {
@@ -89,20 +89,25 @@ function _renderResults(results) {
   var host = qs('#results'),
       best = results[0].amount,
       // sorted results, best rate is always at the top
-  delta,
-      deltaTag;
+  amount,
+      delta,
+      sign;
 
   host.innerHTML = results.map(function (result) {
-    delta = -1 * (best - result.amount);
+    amount = result.amount;
+    delta = -1 * (best - amount);
+    sign = delta > 0 ? "+" : "";
+    rateClass = delta === 0 ? "best-rate" : "";
 
     if (delta === 0) {
-      deltaTag = '<div class="delta best-rate">cel mai bun curs</div>';
+      delta = "cel mai bun curs";
     } else {
-      delta = result.amount < 1000 ? delta.toFixed(2) : Math.round(delta);
-      deltaTag = '<div class="delta">' + Number(delta).toLocaleString('ro-RO') + '</div>';
+      delta = result.amount < 1000 ? Number(delta).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Number(delta).toLocaleString('ro-RO', Math.round(delta));
     }
 
-    return '<li class="result__item">\n      <span class="bank">' + result.bank + '</span>\n      <div class="rate">\n        <div class="total">' + Number(result.amount).toLocaleString('ro-RO') + '</div>\n        ' + deltaTag + '\n      </div>\n    </li>';
+    amount = result.amount < 1000 ? Number(amount).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Number(amount).toLocaleString('ro-RO', Math.round(amount));
+
+    return '<li class="result__item">\n      <span class="bank">' + result.bank + '</span>\n      <div class="rate">\n        <div class="total">' + amount + '</div>\n        <div class="delta ' + rateClass + '">' + sign + delta + '</div>\n      </div>\n    </li>';
   }).join('');
 }
 
