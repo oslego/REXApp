@@ -44,11 +44,10 @@ function _setupSearchForm() {
   var form = qs('#search');
 
   form.addEventListener('submit', function (e) {
-
     var query = {
-      operation: e.target.operation.value === 'buy' ? 'sell' : 'buy',
-      currency: e.target.currency.value,
-      amount: e.target.amount.value
+      operation: form.elements.operation.value === 'buy' ? 'sell' : 'buy',
+      currency: form.elements.currency.value,
+      amount: form.elements.amount.value
     };
 
     _getResults(query).then(_renderResults);
@@ -77,7 +76,7 @@ function _getResults(query) {
             lowest first if bank is selling,
             highest first if bank is buying
           */
-          return query.operation === 'sell' ? a.amount > b.amount : a.amount < b.amount;
+          return query.operation === 'sell' ? a.amount - b.amount : b.amount - a.amount;
         });
 
         resolve(results);
@@ -103,10 +102,10 @@ function _renderResults(results) {
     if (delta === 0) {
       delta = "cel mai bun curs";
     } else {
-      delta = result.amount < 1000 ? Number(delta).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Number(delta).toLocaleString('ro-RO', Math.round(delta));
+      delta = result.amount < 1000 ? Number(delta).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: delta < 1 ? 4 : 2 }) : Math.round(delta).toLocaleString('ro-RO');
     }
 
-    amount = result.amount < 1000 ? Number(amount).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Number(amount).toLocaleString('ro-RO', Math.round(amount));
+    amount = result.amount < 1000 ? Number(amount).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Math.round(amount).toLocaleString('ro-RO');
 
     return '<li class="result__item">\n      <span class="bank">' + result.bank + '</span>\n      <div class="rate">\n        <div class="total">' + amount + '</div>\n        <div class="delta ' + rateClass + '">' + sign + delta + '</div>\n      </div>\n    </li>';
   }).join('');
