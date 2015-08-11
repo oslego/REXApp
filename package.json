@@ -15,6 +15,7 @@
 
     "build": "npm run clean && npm run scaffold && npm run build:js && npm run concat:js && npm run build:html && npm run build:css && npm run autoprefix",
 
+    "deploy": "sh deploy.sh",
     "start": "npm run build:css:dev"
   },
   "devDependencies": {
