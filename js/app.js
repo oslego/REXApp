@@ -97,13 +97,13 @@ function _renderResults(results){
       delta = "cel mai bun curs";
     } else {
       delta = (result.amount < 1000)
-        ? Number(delta).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        : Number(delta).toLocaleString('ro-RO', Math.round(delta));
+        ? Number(delta).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: delta < 1 ? 4 : 2 })
+        : Math.round(delta).toLocaleString('ro-RO');
     }
 
     amount = (result.amount < 1000)
       ? Number(amount).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-      : Number(amount).toLocaleString('ro-RO', Math.round(amount));
+      : Math.round(amount).toLocaleString('ro-RO');
 
     return `<li class="result__item">
       <span class="bank">${result.bank}</span>
