@@ -42,6 +42,15 @@ function _setupCurrencySelect(data) {
 
 function _setupSearchForm() {
   var form = qs('#search');
+  var amountEl = qs('#amount');
+
+  // automatically select input content
+  amountEl.addEventListener('click', function (e) {
+    e.target.select();
+  });
+  amountEl.addEventListener('change', function (e) {
+    console.log(e);
+  });
 
   form.addEventListener('submit', function (e) {
     var query = {
