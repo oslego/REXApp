@@ -1,17 +1,44 @@
 "use strict";
 
-var cache = {};
+window.config = {
+	"banks": {
+		"brd": "BRD",
+		"bcr": "BCR",
+		"garanti": "Garanti Bank",
+		"piraeus": "Piraeus Bank",
+		"alpha": "Alpha Bank",
+		"br": "Banca Romaneasca",
+		"bt": "Banca Transilvania",
+		"otp": "OTP Bank",
+		"bancpost": "Bancpost"
+	},
+	"currencies": {
+		"eur": "Euro",
+		"usd": "Dolari americani",
+		"aud": "Dolari australieni",
+		"cad": "Dolari canadieni",
+		"chf": "Franci elvetieni",
+		"sek": "Coroane suedeze",
+		"dkk": "Coroane daneze",
+		"ikk": "Coroane islandeze",
+		"nok": "Coroane norvegiene",
+		"gbp": "Lire sterline",
+		"jpy": "Yeni japonezi",
+		"huf": "Forinti unguresti",
+		"pln": "Zloti polonezi",
+		"czk": "Coroane cehesti",
+		"rub": "Ruble rusesti",
+		"bgn": "Leva bulgara"
+	},
+	// Cache for results
+	results: []
+}
+
 var qs = document.querySelector.bind(document);
 
 var getConfigData = new Promise(function(resolve, reject){
-  const CONFIG_URL = 'http://api.rexapp.ro/v1/config';
-  JSONP({ url: CONFIG_URL, success: (data) => resolve(data.config) });
+  resolve(window.config)
 })
-
-function _setupCache(data){
-  window.cache.banks = data.banks;
-  return data;
-}
 
 function _setupCurrencySelect(data){
   var currencies = data.currencies,
@@ -22,8 +49,8 @@ function _setupCurrencySelect(data){
       code, name;
 
   for (code in currencies){
-      name = currencies[code].name;
-      tags.push(`<option value="${code}" data-name="${name}">${code} - ${name}</option>\n`)
+      name = currencies[code];
+      tags.push(`<option value="${code}" data-name="${name}">${code.toUpperCase()} - ${name}</option>\n`)
   }
 
   host.innerHTML = tags.join('');
@@ -58,31 +85,55 @@ function _setupSearchForm(){
   })
 }
 
+function _filterCachedResultsByQuery(query) {
+
+	// Reduce our cache to only the sought-after results
+	var rates = window.config.results.reduce((acc, result) => {
+		if (query.currency === result.currency.toLowerCase()) {
+			acc.push(result)
+		}
+		return acc
+	}, [])
+
+  var results = rates.map( (rate) => {
+      var amount = query.amount * rate[query.operation];
+
+      return {
+        bank: window.config.banks[rate.bankId],
+        amount: amount,
+        operation: query.operation
+      }
+    }).sort( (a, b) => {
+      /*
+        Sort results in customer's favor:
+        lowest first if bank is selling,
+        highest first if bank is buying
+      */
+      return (query.operation === 'sell') ? a.amount - b.amount : b.amount - a.amount
+    })
+
+	return results
+}
+
 function _getResults(query){
 
   return new Promise(function(resolve, reject){
-    var URL = `http://api.rexapp.ro/v1/rates/${query.currency}`;
+    // var URL = `http://api.rexapp.ro/v1/rates/${query.currency}`;
+    var URL = `https://rex-crawler-lbkepvgzsb.now.sh`;
 
-    JSONP({ url: URL, success: (data) =>  {
-      var results = data.rates.map( (rate) => {
-          var amount = query.amount * rate[query.operation];
+		if (!window.config.results.length) {
+			fetch(URL)
+			.then(function(response) { return response.json(); })
+			.then((data) =>  {
+				window.config.results = data.results.slice(0);
+				console.log(data)
+				resolve(_filterCachedResultsByQuery(query));
 
-          return {
-            bank: cache.banks[rate.id].name,
-            amount: amount,
-            operation: query.operation
-          }
-        }).sort( (a, b) => {
-          /*
-            Sort results in customer's favor:
-            lowest first if bank is selling,
-            highest first if bank is buying
-          */
-          return (query.operation === 'sell') ? a.amount - b.amount : b.amount - a.amount
-        })
+	    })
+		} else {
+			resolve(_filterCachedResultsByQuery(query));
+		}
 
-      resolve(results);
-    } });
   })
 }
 
@@ -124,7 +175,6 @@ function _init(){
 }
 
 getConfigData
-  .then(_setupCache)
   .then(_setupCurrencySelect)
   .then(_setupSearchForm)
   .then(_init)
